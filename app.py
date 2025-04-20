@@ -2,18 +2,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 import joblib
+import os
 
 # Initialize app
 app = Flask(__name__)
 CORS(app)
 
-# Load models and data
+# Load models and scaler
 lr_15 = joblib.load('lr_model_over_1_5_calibrated.joblib')
-lr_25 = joblib.load('lr_model_over_2_5_calibratedjoblib')
+lr_25 = joblib.load('lr_model_over_2_5_calibrated.joblib')
 btts_model = joblib.load('btts_model_calibrated.joblib')
 win_model = joblib.load('win_model_calibrated.joblib')
 corner_model = joblib.load('corner_model.joblib')
 scaler = joblib.load('scaler_model.joblib')
+
+# Load data
 epl_data = pd.read_excel('epl_team_form_features_updated.xlsx')
 
 # Feature extraction
@@ -51,21 +54,22 @@ def get_form_features(data, home_team, away_team, n=10):
                 'AvgCardsY': matches['AY'].mean(),
                 'AvgCardsR': matches['AR'].mean()
             })
+    
     home_form = compute(home_team, 'Home').add_prefix('Home_')
     away_form = compute(away_team, 'Away').add_prefix('Away_')
-    f = pd.concat([home_form, away_form]).to_frame().T.fillna(0)
-    return scaler.transform(f)
+    features = pd.concat([home_form, away_form]).to_frame().T.fillna(0)
+    return scaler.transform(features)
 
-# Prediction route
+# Prediction endpoint
 @app.route('/predict', methods=['POST'])
 def predict():
     data_json = request.get_json()
     home = data_json['home_team']
     away = data_json['away_team']
-    
+
     X = get_form_features(epl_data, home, away)
 
-    # Predict
+    # Predictions
     over15 = lr_15.predict_proba(X)[0][1]
     over25 = lr_25.predict_proba(X)[0][1]
     btts = btts_model.predict_proba(X)[0][1]
@@ -82,9 +86,6 @@ def predict():
         "corners": round(corners, 2)
     })
 
-import os
-
+# Run app
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-
-
