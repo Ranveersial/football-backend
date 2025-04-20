@@ -9,7 +9,7 @@ CORS(app)
 
 # Load models and data
 lr_15 = joblib.load('lr_model_over_1_5_calibrated.joblib')
-lr_25 = joblib.load('lr_model_over_2_5._calibratedjoblib')
+lr_25 = joblib.load('lr_model_over_2_5_calibratedjoblib')
 btts_model = joblib.load('btts_model_calibrated.joblib')
 win_model = joblib.load('win_model_calibrated.joblib')
 corner_model = joblib.load('corner_model.joblib')
