@@ -8,10 +8,10 @@ app = Flask(__name__)
 CORS(app)
 
 # Load models and data
-lr_15 = joblib.load('lr_model_over_1_5.joblib')
-lr_25 = joblib.load('lr_model_over_2_5.joblib')
-btts_model = joblib.load('btts_model.joblib')
-win_model = joblib.load('win_model.joblib')
+lr_15 = joblib.load('lr_model_over_1_5.joblib_calibrated')
+lr_25 = joblib.load('lr_model_over_2_5.joblib_calibrated')
+btts_model = joblib.load('btts_model_calibrated.joblib')
+win_model = joblib.load('win_model_calibrated.joblib')
 corner_model = joblib.load('corner_model.joblib')
 scaler = joblib.load('scaler_model.joblib')
 epl_data = pd.read_excel('epl_team_form_features_updated.xlsx')
@@ -86,4 +86,5 @@ import os
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+
 
